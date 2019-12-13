@@ -1,0 +1,46 @@
+<div class="container">
+    <div *ngIf="flagPago" class="row" style="padding-top: 20%;">
+        <div class="col-3 col-sm-3 offset-4">
+            <h3>Valor a pagar:</h3>
+        </div>
+        <div class="col-3 col-sm-3 ">
+            <h3><span class="badge badge-primary">${{pago.montoAPagar}}</span></h3>
+        </div>
+        <!-- Force next columns to break to new line -->
+        <div class="w-100"></div>
+        <div class="col-3 col-sm-3 offset-4">
+            <h3>Dinero ingresado:</h3>
+        </div>
+        <div class="col-3 col-sm-3 ">
+            <h3><span class="badge badge-primary">${{pago.dineroIngresado}}</span></h3>
+        </div>
+        <div class="w-100"></div>
+        <div class="col-3 col-sm- offset-4">
+            <h3>Dinero faltante:</h3>
+        </div>
+        <div class="col-3 col-sm-3 ">
+            <h3><span class="badge badge-primary">${{pago.dineroFaltante}}</span></h3>
+        </div>
+    </div>
+    <div *ngIf="flagVuelto" class="row" style="padding-top: 20%;">
+        <div class="col-3 col-sm-3 offset-4">
+            <h3>Dinero regresado:</h3>
+        </div>
+        <div class="col-3 col-sm-3 ">
+            <h3><span class="badge badge-primary">${{vuelto.DineroRegresado}}</span></h3>
+        </div>
+        <!-- Force next columns to break to new line -->
+        <div class="w-100"></div>
+        <div class="col-3 col-sm-3 offset-4">
+            <h3>Dinero faltante:</h3>
+        </div>
+        <div class="col-3 col-sm-3 ">
+            <h3><span class="badge badge-primary">${{vuelto.DineroFaltante}}</span></h3>
+        </div>
+    </div>
+    <div *ngIf="flagPago" class="mx-auto" style="width: 150px; margin-top: 15%;">
+        <button class="btn btn-primary btn-lg" type="submit" id="btnCancelarOp" (click)="cancelarOp()">
+            Cancelar
+        </button>
+    </div>
+</div>
