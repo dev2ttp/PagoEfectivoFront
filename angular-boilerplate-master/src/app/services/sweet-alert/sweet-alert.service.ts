@@ -102,6 +102,30 @@ export class SweetAlertService {
       }
     });
   }
+
+  CalcularOperacion(text: string): void {
+    const html =
+      '<div class="d-flex justify-content-center pt-3"> ' +
+      '<div class="spinner-grow text-primary"></div>' +
+      '<div class="spinner-grow text-info"></div>' +
+      '<div class="spinner-grow text-primary"></div>' +
+      '<div class="spinner-grow text-info"></div>' +
+      '<div class="spinner-grow text-primary"></div>' +
+      '<div class="spinner-grow text-info"></div>' +
+      '</div>';
+    Swal.fire({
+      html,
+      footer: '<span class="sweet-alert-title"> ' + text + '</span>',
+      width: '70%',
+      position: 'center',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      customClass: {
+        title: 'flex-direction',
+        footer: 'border border-0 mt-0 pt-0',
+      }
+    });
+  }
   swalErrorPromise(message: string): Promise<any> {
     return Swal.fire({
       icon: 'error',

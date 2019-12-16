@@ -30,6 +30,8 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   flagPago: boolean = true;
   flagEstPago: boolean = false;
   flagEstVuelto: boolean = false;
+  flagModalProcesandodatos: boolean = false;
+  flagModalProcesandoVueltos: boolean = false;
 
   pago: Pago = {
     montoAPagar: 0,
@@ -69,8 +71,13 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           }
           this.pago.dineroIngresado = response['data']['dineroIngresado'];
           this.pago.dineroFaltante = response['data']['dineroFaltante'];
-
+          
+          if (this.pago.dineroFaltante == 1 && this.flagModalProcesandodatos == false) {
+            this.flagModalProcesandodatos = true;
+            this.sweetAlertService.CalcularOperacion("Procesando datos Por favor espere");
+          }
           if (this.pago.dineroFaltante < 0) {
+            this.sweetAlertService.swalClose();
             this.flagVuelto = true;
             this.flagPago = false;
             this.ngxToastrService.warn("entregando vuelto");
@@ -107,6 +114,10 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           this.vuelto.VueltoFinalizado = response['data']['vueltoFinalizado'];
           this.vuelto.DineroFaltante = response['data']['dineroFaltante'];
           this.vuelto.DineroRegresado = response['data']['dineroRegresado'];
+          if (this.vuelto.DineroFaltante == 0 && this.flagModalProcesandoVueltos == false) {
+            this.flagModalProcesandoVueltos = true;
+            this.sweetAlertService.CalcularOperacion("Procesando datos Por favor espere");
+          }
         }
         else if(!this.flagEstVuelto)
         {
@@ -157,8 +168,31 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     }
   }
   async cancelaTimeOutPago() {
-    this.subEstDinero.unsubscribe();
-    this.subOutPago.unsubscribe();
+    if (this.subStdVuelto) {
+      console.log("entro fuera vuelto");
+      
+      this.subStdVuelto.unsubscribe();
+    }
+
+    if (this.subOutPago) {
+      console.log("entro fuera pago");
+      this.subOutPago.unsubscribe();
+    }
+
+    if (this.subEstDinero) {
+      console.log("entro a timer dinero");
+      this.subEstDinero.unsubscribe();
+    }
+
+    if (this.subCancelacion) {
+      console.log("entro a quitar cancelacion");
+      this.subCancelacion.unsubscribe();
+    }
+
+    if (this.subAlertCtn) {
+      console.log("entro quitar alerta");
+      this.subAlertCtn.unsubscribe();
+    }
     this.sweetAlertService.swalTimeOutPago();
     this.subAlertCtn = this.sweetAlertService.confirmation.subscribe(data => {
       if (data == "cancelar") {
@@ -189,7 +223,34 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     this.subOutPago = source.subscribe(val => this.cancelaTimeOutPago());
   }
   ngOnDestroy() {
-    this.subEstDinero.unsubscribe();
-    this.subOutPago.unsubscribe();
+
+    if (this.subStdVuelto) {
+      console.log("entro");
+      
+      this.subStdVuelto.unsubscribe();
+    }
+
+    if (this.subOutPago) {
+      console.log("entro");
+      this.subOutPago.unsubscribe();
+    }
+
+    if (this.subOutPago) {
+      console.log("entro");
+      this.subOutPago.unsubscribe();
+    }
+
+    if (this.subCancelacion) {
+      console.log("entro");
+      this.subCancelacion.unsubscribe();
+    }
+
+    if (this.subAlertCtn) {
+      console.log("entro");
+      this.subAlertCtn.unsubscribe();
+    }
+    
+    
+    
   }
 }
