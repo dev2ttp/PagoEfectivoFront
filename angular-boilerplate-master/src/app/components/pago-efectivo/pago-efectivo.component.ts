@@ -114,12 +114,13 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           this.vuelto.VueltoFinalizado = response['data']['vueltoFinalizado'];
           this.vuelto.DineroFaltante = response['data']['dineroFaltante'];
           this.vuelto.DineroRegresado = response['data']['dineroRegresado'];
+          var vueltoFinilazado = response['data']['vueltoFinalizado'];
           if (this.vuelto.DineroFaltante == 0 && this.flagModalProcesandoVueltos == false) {
             this.flagModalProcesandoVueltos = true;
             this.sweetAlertService.CalcularOperacion("Procesando datos Por favor espere");
           }
         }
-        else if(!this.flagEstVuelto)
+        else if(!this.flagEstVuelto || vueltoFinilazado == true)
         {
           this.router.navigate(['/pago']);
           this.sweetAlertService.swalSuccess("Pago realizado, imprimiendo ticket")
@@ -248,9 +249,6 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     if (this.subAlertCtn) {
       console.log("entro");
       this.subAlertCtn.unsubscribe();
-    }
-    
-    
-    
+    }     
   }
 }
