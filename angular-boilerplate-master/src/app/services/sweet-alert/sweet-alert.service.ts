@@ -28,6 +28,14 @@ export class SweetAlertService {
       showConfirmButton: false,
     });
   }
+  swalErrorM(message: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: 'Ups...',
+      text: message,
+      confirmButtonColor: '#36ABAC'
+    });
+  }
   swalError(): void {
     Swal.fire({
       icon: 'error',
