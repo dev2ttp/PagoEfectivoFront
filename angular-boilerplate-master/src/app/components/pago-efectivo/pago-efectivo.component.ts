@@ -6,7 +6,7 @@ import { Vuelto } from '../../models/pago/vuelto';
 import { Router } from '@angular/router';
 import { log } from 'util';
 import { SweetAlertService } from '../../services/sweet-alert/sweet-alert.service';
-import { NgxToastrService } from '../../services/ngx-toastr/ngx-toastr.service'
+import { NgxToastrService } from '../../services/ngx-toastr/ngx-toastr.service';
 import Swal from 'sweetalert2';
 import { delay } from 'q';
 
@@ -51,7 +51,7 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.timerEstadoDinero();
     //this.pago.montoAPagar = (Math.round(Math.floor(Math.random() * (2000 - 100)) + 100))*10;
-    this.pago.montoAPagar = (Math.round(Math.floor(Math.random() * (100 - 10)) + 10)) * 100
+    this.pago.montoAPagar = 3000//(Math.round(Math.floor(Math.random() * (10 - 1)) + 1)) * 2000
   }
   async estadoDinero() {
     try {

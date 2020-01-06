@@ -28,6 +28,21 @@ export class PagoServiceService {
       return resultado;
     }
   }
+  async finalizarPago() {
+    try {
+      return await this.http.get(
+        this.apiUrl + "/finalizarPago", { headers: this.headers }
+      ).toPromise();
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }
+  }
   async cancelarOp() {
     try {
       return await this.http.get(
@@ -81,6 +96,21 @@ export class PagoServiceService {
         "VueltoTotal": req
       };
       return await this.http.post(`${this.apiUrl}/VueltoRegresado`, request, { headers: this.headers }).toPromise()
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }
+  }
+  async floatByDenomination() {
+    try {
+      return await this.http.get(
+        this.apiUrl + "/Float", { headers: this.headers }
+      ).toPromise();
     } catch (error) {
       let resultado =
       {
