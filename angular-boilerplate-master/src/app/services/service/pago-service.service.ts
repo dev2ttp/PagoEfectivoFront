@@ -121,4 +121,34 @@ export class PagoServiceService {
       return resultado;
     }
   }
+  async estadSalud() {
+    try {
+      return await this.http.get(
+        this.apiUrl + "/EstadoSalud", { headers: this.headers }
+      ).toPromise();
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }
+  }
+  async detenerVuelto() {
+    try {
+      return await this.http.get(
+        this.apiUrl + "/DetenerVuelto", { headers: this.headers }
+      ).toPromise();
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }
+  }
 }

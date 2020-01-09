@@ -26,12 +26,15 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   subOutPago: Subscription;
   flagOutPago: boolean = false;
   subAlertCtn: Subscription;
+  subDetenerVuelto: Subscription;
   flagVuelto: boolean = false;
   flagPago: boolean = true;
   flagEstPago: boolean = false;
   flagEstVuelto: boolean = false;
   flagModalProcesandodatos: boolean = false;
   flagModalProcesandoVueltos: boolean = false;
+  flagConsultaEST: boolean = false;
+  flagDetenerVuelto: boolean = false;
 
   pago: Pago = {
     montoAPagar: 0,
@@ -51,13 +54,20 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.timerEstadoDinero();
     //this.pago.montoAPagar = (Math.round(Math.floor(Math.random() * (2000 - 100)) + 100))*10;
-    this.pago.montoAPagar = 3000//(Math.round(Math.floor(Math.random() * (10 - 1)) + 1)) * 2000
+    this.pago.montoAPagar = 2000//(Math.round(Math.floor(Math.random() * (10 - 1)) + 1)) * 2000
   }
   async estadoDinero() {
     try {
       var response = await this.PagoService.detallesPago2(this.pago.montoAPagar)
       console.log("estadoDinero: " + JSON.stringify(response));
       if (response['status']) {
+        if (response['bloqueoEfectivo'] && this.flagConsultaEST == false) {
+          console.log("bloqueo!! bloqueo!!")
+          this.flagConsultaEST = true;
+          this.cancelarOp();
+          this.router.navigate(['/pago']);
+          this.subEstDinero.unsubscribe();
+        }
         if (response['pagoStatus'] == false) {
           if (this.pago.dineroIngresado == response['data']['dineroIngresado']) {
             if (!this.flagOutPago) {
@@ -71,7 +81,7 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           }
           this.pago.dineroIngresado = response['data']['dineroIngresado'];
           this.pago.dineroFaltante = response['data']['dineroFaltante'];
-          
+
           if (this.pago.dineroFaltante == 1 && this.flagModalProcesandodatos == false) {
             this.flagModalProcesandodatos = true;
             this.sweetAlertService.CalcularOperacion("Procesando datos Por favor espere");
@@ -94,8 +104,7 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           this.subEstDinero.unsubscribe();
         }
       }
-      else if(response['status'] == false && this.flagEstPago == false)
-      {
+      else if (response['status'] == false && this.flagEstPago == false) {
         this.sweetAlertService.swalWarning("No tenemos vuelto, le devolveremos su dinero");
         setTimeout(() => { this.cancelarOp(); }, 4000);
         this.router.navigate(['/pago']);
@@ -110,7 +119,28 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       var response = await this.PagoService.detallesVuelto(this.vuelto.VueltoTotal)
       console.log("estadoVuelto: " + JSON.stringify(response));
       if (response['status']) {
+
+        if (response['bloqueoEfectivo'] && this.flagConsultaEST == false) {
+          console.log("bloqueo!! bloqueo!!")
+          this.flagConsultaEST = true;
+          this.detenerVuelto();
+          this.router.navigate(['/pago']);
+          this.subStdVuelto.unsubscribe();
+        }
+
+
         if (response['pagoStatus'] == false) {
+          if (this.vuelto.DineroFaltante == response['data']['dineroFaltante']) {
+            if (!this.flagDetenerVuelto) {
+              this.flagDetenerVuelto = true;
+              this.timerDetenerVuelto();
+            }
+          }
+          else {
+            this.flagOutPago = false;
+            this.subOutPago.unsubscribe();
+            this.subDetenerVuelto.unsubscribe();
+          }
           this.vuelto.VueltoFinalizado = response['data']['vueltoFinalizado'];
           this.vuelto.DineroFaltante = response['data']['dineroFaltante'];
           this.vuelto.DineroRegresado = response['data']['dineroRegresado'];
@@ -120,17 +150,15 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
             this.sweetAlertService.CalcularOperacion("Procesando datos Por favor espere");
           }
         }
-        else if(!this.flagEstVuelto || vueltoFinilazado == true)
-        {
+        else if (!this.flagEstVuelto || vueltoFinilazado == true) {
           this.router.navigate(['/pago']);
           this.sweetAlertService.swalSuccess("Pago realizado, imprimiendo ticket")
           this.subStdVuelto.unsubscribe();
           this.flagEstVuelto = true;
         }
       }
-      else
-      {
-        this.sweetAlertService.swalError();       
+      else {
+        this.sweetAlertService.swalError();
         this.router.navigate(['/pago']);
         this.subStdVuelto.unsubscribe();
       }
@@ -142,10 +170,10 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     try {
       this.subEstDinero.unsubscribe();
       this.sweetAlertService.swalLoading("Cancelando operacion");
-      let response = await this.PagoService.cancelarOp();
+      var response = await this.PagoService.cancelarOp();
 
       console.log("cancelarOP: " + JSON.stringify(response));
-      if (response) {
+      if (response['status']) {
         this.timerCancelacionPago();
       }
     } catch (error) {
@@ -154,9 +182,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   }
   async estadoCancelacionPago() {
     try {
-      let response = await this.PagoService.estadoCancelacion();
+      var response = await this.PagoService.estadoCancelacion();
       console.log("estadoCancelacionPago: " + JSON.stringify(response));
-      
+
       if (response['cancelacionCompleta'] == true && response['entregandoVuelto'] == false) {
         this.router.navigate(['/pago']);
         Swal.close();
@@ -171,7 +199,7 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   async cancelaTimeOutPago() {
     if (this.subStdVuelto) {
       console.log("entro fuera vuelto");
-      
+
       this.subStdVuelto.unsubscribe();
     }
 
@@ -207,6 +235,11 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       }
     });
   }
+  async detenerVuelto() {
+    var response = await this.PagoService.detenerVuelto();
+    console.log("detenerVuelto: " + JSON.stringify(response));
+
+  }
   timerEstadoDinero() {
     const source = interval(2000);
     this.subEstDinero = source.subscribe(val => this.estadoDinero());
@@ -223,32 +256,35 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     const source = interval(60000);
     this.subOutPago = source.subscribe(val => this.cancelaTimeOutPago());
   }
+  timerDetenerVuelto() {
+    const source = interval(60000);
+    this.subDetenerVuelto = source.subscribe(val => this.detenerVuelto());
+  }
   ngOnDestroy() {
 
     if (this.subStdVuelto) {
       console.log("entro");
-      
       this.subStdVuelto.unsubscribe();
     }
-
     if (this.subOutPago) {
       console.log("entro");
       this.subOutPago.unsubscribe();
     }
-
     if (this.subOutPago) {
       console.log("entro");
       this.subOutPago.unsubscribe();
     }
-
     if (this.subCancelacion) {
       console.log("entro");
       this.subCancelacion.unsubscribe();
     }
-
     if (this.subAlertCtn) {
       console.log("entro");
       this.subAlertCtn.unsubscribe();
-    }     
+    }
+    if (this.subDetenerVuelto) {
+      console.log("entro");
+      this.subDetenerVuelto.unsubscribe();
+    }
   }
 }
