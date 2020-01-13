@@ -5,25 +5,34 @@ import { SweetAlertService } from '../../services/sweet-alert/sweet-alert.servic
 import Swal from 'sweetalert2';
 import { NgxToastrService } from '../../services/ngx-toastr/ngx-toastr.service';
 import { interval, Subscription, from } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { TRANSITION_DURATIONS } from 'ngx-bootstrap/modal/modal-options.class';
 
 @Component({
   selector: 'app-pago',
   templateUrl: './pago.component.html',
-  styleUrls: ['./pago.component.css'] 
+  styleUrls: ['./pago.component.css']
 })
 export class PagoComponent implements OnInit {
 
   subConsultaEST: Subscription;
   flagMensajeEST: boolean = false;
+  //Datos Front
+  StatusFront: boolean = false;
+  DatosFront: string = "";
+  DatosRuta: string = "no ha llegado";
 
-  constructor(private PagoService: PagoServiceService, private router: Router, private sweetAlertService: SweetAlertService, private ngxToastrService: NgxToastrService) { }
+  constructor(private PagoService: PagoServiceService, private router: Router, private sweetAlertService: SweetAlertService, private ngxToastrService: NgxToastrService, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.PagoService.floatByDenomination();
     this.timerConsultaEST();
+
+    this.DatosRuta = this.route.snapshot.queryParams.monto;
+    console.log(this.route);
+    
   }
-  async inicioPago() {    
+  async inicioPago() {
     this.sweetAlertService.swalLoading("Iniciando");
     var response = await this.PagoService.iniciarPago();
     Swal.close();
@@ -33,18 +42,17 @@ export class PagoComponent implements OnInit {
       console.log("bloqueo!!! bloqueo!!!")
       this.flagMensajeEST = true;
       this.sweetAlertService.CalcularOperacion("Temporalmente fuera de servicio");
-    }else
-    {
+    } else {
       if (response['status']) {
-        if (response['statusMaquina'] == false && response['nivelBloqueo']== true) {
+        if (response['statusMaquina'] == false && response['nivelBloqueo'] == true) {
           this.sweetAlertService.swalErrorM(response['mensajeAmostrar']);
         }
-        else if(response['statusMaquina'] == false && response['nivelBloqueo']== false) {
+        else if (response['statusMaquina'] == false && response['nivelBloqueo'] == false) {
           this.ngxToastrService.warn(response['mensajeAmostrar']);
-          this.router.navigate(['/efectivo']);
+          this.router.navigate(['/efectivo?monto=10000']);
         }
         else {
-          this.router.navigate(['/efectivo']);
+          this.router.navigate(['/efectivo?monto=10000']);
           this.sweetAlertService.swalSuccess("Ingrese dinero");
         }
       }
@@ -55,24 +63,23 @@ export class PagoComponent implements OnInit {
   }
   async consultaEST() {
     var response = await this.PagoService.estadSalud();
-    console.log("estado salud:"+JSON.stringify(response));
+    console.log("estado salud:" + JSON.stringify(response));
     if (response['bloqueoEfectivo']) {
       if (!this.flagMensajeEST) {
-        this.sweetAlertService.CalcularOperacion("Temporalmente fuera de servicio");  
+        this.sweetAlertService.CalcularOperacion("Temporalmente fuera de servicio");
       }
-      this.flagMensajeEST = true;      
+      this.flagMensajeEST = true;
     }
-    else
-    {
+    else {
       Swal.close();
-      this.flagMensajeEST = false; 
+      this.flagMensajeEST = false;
     }
   }
   timerConsultaEST() {
     const source = interval(3000);
     this.subConsultaEST = source.subscribe(val => this.consultaEST());
   }
-  ngOnDestroy() {  
+  ngOnDestroy() {
     this.subConsultaEST.unsubscribe();
   }
 }

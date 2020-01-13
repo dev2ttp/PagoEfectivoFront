@@ -8,6 +8,7 @@ import { log } from 'util';
 import { SweetAlertService } from '../../services/sweet-alert/sweet-alert.service';
 import { NgxToastrService } from '../../services/ngx-toastr/ngx-toastr.service';
 import Swal from 'sweetalert2';
+import { ActivatedRoute } from '@angular/router';
 import { delay } from 'q';
 
 @Component({
@@ -36,6 +37,12 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   flagConsultaEST: boolean = false;
   flagDetenerVuelto: boolean = false;
 
+  //Datos Front
+  StatusFront: boolean = false;
+  DatosFront: string = "";
+
+  DatosRuta: number = 4;
+
   pago: Pago = {
     montoAPagar: 0,
     dineroIngresado: 0,
@@ -49,12 +56,15 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     VueltoFinalizado: false
   };
 
-  constructor(private PagoService: PagoServiceService, private router: Router, private sweetAlertService: SweetAlertService, private ngxToastrService: NgxToastrService) {
+  constructor(private PagoService: PagoServiceService, private router: Router, private sweetAlertService: SweetAlertService, private ngxToastrService: NgxToastrService,private route: ActivatedRoute) {
   }
   ngOnInit() {
     this.timerEstadoDinero();
     //this.pago.montoAPagar = (Math.round(Math.floor(Math.random() * (2000 - 100)) + 100))*10;
     this.pago.montoAPagar = 2000//(Math.round(Math.floor(Math.random() * (10 - 1)) + 1)) * 2000
+    this.DatosRuta = this.route.snapshot.queryParams.monto;
+    this.pago.montoAPagar =  this.DatosRuta;
+    console.log(this.route);
   }
   async estadoDinero() {
     try {
@@ -65,7 +75,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           console.log("bloqueo!! bloqueo!!")
           this.flagConsultaEST = true;
           this.cancelarOp();
-          this.router.navigate(['/pago']);
+          //this.router.navigate(['/pago']);
+          this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
+          this.StatusFront = true;
           this.subEstDinero.unsubscribe();
         }
         if (response['pagoStatus'] == false) {
@@ -98,7 +110,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           }
         }
         else if (!this.flagEstPago) {
-          this.router.navigate(['/pago']);
+          this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;   
+          this.StatusFront = true;
+          //this.router.navigate(['/pago']);
           this.sweetAlertService.swalSuccess("Pago realizado, imprimiendo ticket")
           this.flagEstPago = true;
           this.subEstDinero.unsubscribe();
@@ -107,7 +121,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       else if (response['status'] == false && this.flagEstPago == false) {
         this.sweetAlertService.swalWarning("No tenemos vuelto, le devolveremos su dinero");
         setTimeout(() => { this.cancelarOp(); }, 4000);
-        this.router.navigate(['/pago']);
+        //this.router.navigate(['/pago']);
+        this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
+        this.StatusFront = true;
         this.subEstDinero.unsubscribe();
       }
     } catch (error) {
@@ -124,7 +140,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           console.log("bloqueo!! bloqueo!!")
           this.flagConsultaEST = true;
           this.detenerVuelto();
-          this.router.navigate(['/pago']);
+          //this.router.navigate(['/pago']);
+          this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
+          this.StatusFront = true;
           this.subStdVuelto.unsubscribe();
         }
 
@@ -151,7 +169,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           }
         }
         else if (!this.flagEstVuelto || vueltoFinilazado == true) {
-          this.router.navigate(['/pago']);
+          //this.router.navigate(['/pago']);
+          this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
+          this.StatusFront = true;
           this.sweetAlertService.swalSuccess("Pago realizado, imprimiendo ticket")
           this.subStdVuelto.unsubscribe();
           this.flagEstVuelto = true;
@@ -159,7 +179,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       }
       else {
         this.sweetAlertService.swalError();
-        this.router.navigate(['/pago']);
+        //this.router.navigate(['/pago']);
+        this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
+        this.StatusFront = true;
         this.subStdVuelto.unsubscribe();
       }
     } catch (error) {
@@ -186,7 +208,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       console.log("estadoCancelacionPago: " + JSON.stringify(response));
 
       if (response['cancelacionCompleta'] == true && response['entregandoVuelto'] == false) {
-        this.router.navigate(['/pago']);
+        //this.router.navigate(['/pago']);
+        this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
+        this.StatusFront = true;
         Swal.close();
         this.subCancelacion.unsubscribe();
       }
