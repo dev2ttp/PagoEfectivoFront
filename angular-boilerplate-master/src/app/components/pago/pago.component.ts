@@ -18,17 +18,23 @@ export class PagoComponent implements OnInit {
   subConsultaEST: Subscription;
   flagMensajeEST: boolean = false;
   //Datos Front
-  StatusFront: boolean = false;
+  StatusFront: string = "false";
+  CodigoFront: string = "";
   DatosFront: string = "";
   DatosRuta: string = "no ha llegado";
 
   constructor(private PagoService: PagoServiceService, private router: Router, private sweetAlertService: SweetAlertService, private ngxToastrService: NgxToastrService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.PagoService.floatByDenomination();
+    //this.PagoService.floatByDenomination();
     this.timerConsultaEST();
 
     this.DatosRuta = this.route.snapshot.queryParams.monto;
+    localStorage.setItem("monto", this.DatosRuta);
+    this.CodigoFront = localStorage.getItem("codigo");
+    this.StatusFront = localStorage.getItem("status");
+    localStorage.setItem("status", "false");
+    localStorage.setItem("codigo", "4");
     console.log(this.route);
     
   }
@@ -49,10 +55,10 @@ export class PagoComponent implements OnInit {
         }
         else if (response['statusMaquina'] == false && response['nivelBloqueo'] == false) {
           this.ngxToastrService.warn(response['mensajeAmostrar']);
-          this.router.navigate(['/efectivo?monto=10000']);
+          this.router.navigate(['/efectivo']);
         }
         else {
-          this.router.navigate(['/efectivo?monto=10000']);
+          this.router.navigate(['/efectivo']);
           this.sweetAlertService.swalSuccess("Ingrese dinero");
         }
       }

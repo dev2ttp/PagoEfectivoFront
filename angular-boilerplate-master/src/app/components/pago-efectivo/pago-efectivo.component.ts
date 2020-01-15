@@ -40,7 +40,7 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   //Datos Front
   StatusFront: boolean = false;
   DatosFront: string = "";
-
+  CodigoFront: string = "";
   DatosRuta: number = 4;
 
   pago: Pago = {
@@ -63,7 +63,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     //this.pago.montoAPagar = (Math.round(Math.floor(Math.random() * (2000 - 100)) + 100))*10;
     this.pago.montoAPagar = 2000//(Math.round(Math.floor(Math.random() * (10 - 1)) + 1)) * 2000
     this.DatosRuta = this.route.snapshot.queryParams.monto;
-    this.pago.montoAPagar =  this.DatosRuta;
+    this.pago.montoAPagar = parseInt(localStorage.getItem("monto"));
+    localStorage.setItem("status", "false");
+    //this.pago.montoAPagar =  this.DatosRuta;
     console.log(this.route);
   }
   async estadoDinero() {
@@ -75,9 +77,12 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           console.log("bloqueo!! bloqueo!!")
           this.flagConsultaEST = true;
           this.cancelarOp();
-          //this.router.navigate(['/pago']);
+          this.CodigoFront = "1";
+          localStorage.setItem("codigo", this.CodigoFront);
           this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
           this.StatusFront = true;
+          localStorage.setItem("status", "true");
+          this.router.navigate(['/pago']);
           this.subEstDinero.unsubscribe();
         }
         if (response['pagoStatus'] == false) {
@@ -112,7 +117,10 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
         else if (!this.flagEstPago) {
           this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;   
           this.StatusFront = true;
-          //this.router.navigate(['/pago']);
+          this.CodigoFront = "0";
+          localStorage.setItem("codigo", this.CodigoFront);
+          localStorage.setItem("status", "true");
+          this.router.navigate(['/pago']);
           this.sweetAlertService.swalSuccess("Pago realizado, imprimiendo ticket")
           this.flagEstPago = true;
           this.subEstDinero.unsubscribe();
@@ -121,9 +129,12 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       else if (response['status'] == false && this.flagEstPago == false) {
         this.sweetAlertService.swalWarning("No tenemos vuelto, le devolveremos su dinero");
         setTimeout(() => { this.cancelarOp(); }, 4000);
-        //this.router.navigate(['/pago']);
+        this.CodigoFront = "1";
         this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
         this.StatusFront = true;
+        localStorage.setItem("codigo", this.CodigoFront);
+        localStorage.setItem("status", "true");
+        this.router.navigate(['/pago']);
         this.subEstDinero.unsubscribe();
       }
     } catch (error) {
@@ -140,9 +151,12 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           console.log("bloqueo!! bloqueo!!")
           this.flagConsultaEST = true;
           this.detenerVuelto();
-          //this.router.navigate(['/pago']);
+          this.CodigoFront = "1";
           this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
           this.StatusFront = true;
+          localStorage.setItem("codigo", this.CodigoFront);
+          localStorage.setItem("status", "true");
+          this.router.navigate(['/pago']);
           this.subStdVuelto.unsubscribe();
         }
 
@@ -169,9 +183,12 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           }
         }
         else if (!this.flagEstVuelto || vueltoFinilazado == true) {
-          //this.router.navigate(['/pago']);
+          this.CodigoFront = "0";
           this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
           this.StatusFront = true;
+          localStorage.setItem("codigo", this.CodigoFront);
+          localStorage.setItem("status", "true");
+          this.router.navigate(['/pago']);
           this.sweetAlertService.swalSuccess("Pago realizado, imprimiendo ticket")
           this.subStdVuelto.unsubscribe();
           this.flagEstVuelto = true;
@@ -179,9 +196,12 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       }
       else {
         this.sweetAlertService.swalError();
-        //this.router.navigate(['/pago']);
+        this.CodigoFront = "1";
         this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
         this.StatusFront = true;
+        localStorage.setItem("codigo", this.CodigoFront);
+        localStorage.setItem("status", "true");
+        this.router.navigate(['/pago']);
         this.subStdVuelto.unsubscribe();
       }
     } catch (error) {
@@ -208,9 +228,13 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       console.log("estadoCancelacionPago: " + JSON.stringify(response));
 
       if (response['cancelacionCompleta'] == true && response['entregandoVuelto'] == false) {
-        //this.router.navigate(['/pago']);
+        
+        this.CodigoFront = "1";
         this.DatosFront = this.pago.montoAPagar + "," + this.pago.dineroIngresado + "," +this.pago.dineroFaltante + "," + this.vuelto.VueltoTotal + "," + this.vuelto.DineroRegresado + "," + this.vuelto.DineroFaltante;
         this.StatusFront = true;
+        localStorage.setItem("codigo", this.CodigoFront);
+        localStorage.setItem("status", "true");
+        this.router.navigate(['/pago']);
         Swal.close();
         this.subCancelacion.unsubscribe();
       }

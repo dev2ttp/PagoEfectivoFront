@@ -1,6 +1,9 @@
+<form name="fTP" id="fTP">
+    <input type="hidden" id="Status" name="Status" [value]="StatusFront">
+    <input type="hidden" id="Codigo" name="Codigo" [value]="CodigoFront">
+    <input type="hidden" id="Datos" name="Datos" [value]="DatosFront">
+</form>
 <div class="container">
-    <input type="hidden" id="Status" [(ngModel)]="StatusFront">
-    <input type="hidden" id="Datos" [(ngModel)]="DatosFront">
     <div class="mx-auto" style="width: 150px; margin-top: 32%;">
         <button class="btn btn-primary btn-lg" type="submit" id="submit" (click)="inicioPago()">
             Efectivo {{DatosRuta}}
