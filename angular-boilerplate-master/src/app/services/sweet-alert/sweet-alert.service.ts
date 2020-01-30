@@ -1,5 +1,6 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import Swal from 'sweetalert2';
+import { MAT_RIPPLE_GLOBAL_OPTIONS } from '@angular/material/core';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class SweetAlertService {
       icon: 'success',
       title: message,
       showConfirmButton: false,
-      timer: 2000
+      timer: 2000,
+      backdrop: '#FFFFFF'
     });
   }
   swalWarning(message: string): void {
@@ -26,6 +28,16 @@ export class SweetAlertService {
       title: 'Ups...',
       text:message,
       showConfirmButton: false,
+      backdrop: '#FFFFFF'
+    });
+  }
+  swalErrorM(message: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: 'Ups...',
+      text: message,
+      confirmButtonColor: '#36ABAC',
+      backdrop: '#FFFFFF'
     });
   }
   swalError(): void {
@@ -33,7 +45,8 @@ export class SweetAlertService {
       icon: 'error',
       title: 'Ups...',
       text: '¡Algo salió mal!',
-      confirmButtonColor: '#36ABAC'
+      confirmButtonColor: '#36ABAC',
+      backdrop: '#FFFFFF'
     });
   }
   swalConfirmDialog(data): void {
@@ -45,7 +58,8 @@ export class SweetAlertService {
       confirmButtonColor: '#36ABAC',
       cancelButtonColor: '#E06162',
       cancelButtonText: 'Cancelar',
-      confirmButtonText: 'Si, eliminar'
+      confirmButtonText: 'Si, eliminar',
+      backdrop: '#FFFFFF'
     }).then((result) => {
       if (result.value) {
         this.confirmation.emit(data);
@@ -56,7 +70,8 @@ export class SweetAlertService {
     Swal.fire({
       title: 'Iniciando proceso de pago',
       text: '¡Se esta iniciando el proceso \nPor favor espere !',
-      icon: 'warning'
+      icon: 'warning',
+      backdrop: '#FFFFFF',
     }).then((result) => {
       if (result.value) {
         this.confirmation.emit(data);
@@ -73,6 +88,7 @@ export class SweetAlertService {
       width: '100%',
       position: 'center',
       showConfirmButton: false,
+      backdrop: '#FFFFFF',
       customClass: {
         popup: 'border-blue',
         title: 'flex-direction',
@@ -96,6 +112,32 @@ export class SweetAlertService {
       position: 'center',
       showConfirmButton: false,
       allowOutsideClick: false,
+      backdrop: '#FFFFFF',
+      customClass: {
+        title: 'flex-direction',
+        footer: 'border border-0 mt-0 pt-0',
+      }
+    });
+  }
+
+  CalcularOperacion(text: string): void {
+    const html =
+      '<div class="d-flex justify-content-center pt-3"> ' +
+      '<div class="spinner-grow text-primary"></div>' +
+      '<div class="spinner-grow text-info"></div>' +
+      '<div class="spinner-grow text-primary"></div>' +
+      '<div class="spinner-grow text-info"></div>' +
+      '<div class="spinner-grow text-primary"></div>' +
+      '<div class="spinner-grow text-info"></div>' +
+      '</div>';
+    Swal.fire({
+      html,
+      footer: '<span class="sweet-alert-title"> ' + text + '</span>',
+      width: '70%',
+      position: 'center',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      backdrop: '#FFFFFF',
       customClass: {
         title: 'flex-direction',
         footer: 'border border-0 mt-0 pt-0',
@@ -107,7 +149,8 @@ export class SweetAlertService {
       icon: 'error',
       title: '¡Algo salió mal!',
       text: message,
-      confirmButtonColor: '#36ABAC'
+      confirmButtonColor: '#36ABAC',
+      backdrop: '#FFFFFF',
     });
   }
   swalTimeOutPago(): void {
@@ -124,6 +167,7 @@ export class SweetAlertService {
       confirmButtonText: 'Si, continuar',
       allowOutsideClick: false,
       timerProgressBar: true,
+      backdrop: '#FFFFFF',
       onBeforeOpen: () => {
         //Swal.showLoading()
         timerInterval = setInterval(() => {

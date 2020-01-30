@@ -9,14 +9,33 @@ export class PagoServiceService {
   apiUrl: string;
   headers = new HttpHeaders().set('Content-Type', 'application/json').set('Accept', 'application/json');
 
+  status: string;
+
   constructor(private http: HttpClient) {
     //this.apiUrl= 'https://172.16.33.121/api/Pago';
     this.apiUrl = 'http://172.16.33.121:59579/api/Pago';
   }
-  async iniciarPago() {
+  async iniciarPago(req) {
+    try {
+      var request = {
+        "MontoApagar": req
+      };
+      return await this.http.post(`${this.apiUrl}/IniciarPago`, request, { headers: this.headers }).toPromise()
+
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }   
+  }
+  async finalizarPago() {
     try {
       return await this.http.get(
-        this.apiUrl + "/IniciarPago", { headers: this.headers }
+        this.apiUrl + "/finalizarPago", { headers: this.headers }
       ).toPromise();
     } catch (error) {
       let resultado =
@@ -81,6 +100,51 @@ export class PagoServiceService {
         "VueltoTotal": req
       };
       return await this.http.post(`${this.apiUrl}/VueltoRegresado`, request, { headers: this.headers }).toPromise()
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }
+  }
+  async floatByDenomination() {
+    try {
+      return await this.http.get(
+        this.apiUrl + "/Float", { headers: this.headers }
+      ).toPromise();
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }
+  }
+  async estadSalud() {
+    try {
+      return await this.http.get(
+        this.apiUrl + "/EstadoSalud", { headers: this.headers }
+      ).toPromise();
+    } catch (error) {
+      let resultado =
+      {
+        'status': false,
+        'data': 'error al ejeceutar petición',
+        'codeStatus': error.status
+      };
+      return resultado;
+    }
+  }
+  async detenerVuelto() {
+    try {
+      return await this.http.get(
+        this.apiUrl + "/DetenerVuelto", { headers: this.headers }
+      ).toPromise();
     } catch (error) {
       let resultado =
       {

@@ -1,10 +1,17 @@
+<!--<form name="fTP" id="fTP">
+        <input type="hidden" id="Status" name="Status" [value]="StatusFront">
+        <input type="hidden" id="Codigo" name="Codigo" [value]="CodigoFront">
+        <input type="hidden" id="Datos" name="Datos" [value]="DatosFront">
+    </form> -->
 <div class="container">
     <div *ngIf="flagPago" class="row" style="padding-top: 20%;">
         <div class="col-3 col-sm-3 offset-4">
             <h3>Valor a pagar:</h3>
         </div>
         <div class="col-3 col-sm-3 ">
-            <h3><span class="badge badge-primary">${{pago.montoAPagar}}</span></h3>
+            <h3>
+                <span class="badge badge-primary">${{pago.montoAPagar}}</span>
+            </h3>
         </div>
         <!-- Force next columns to break to new line -->
         <div class="w-100"></div>
@@ -12,14 +19,23 @@
             <h3>Dinero ingresado:</h3>
         </div>
         <div class="col-3 col-sm-3 ">
-            <h3><span class="badge badge-primary">${{pago.dineroIngresado}}</span></h3>
+            <h3>
+                <span class="badge badge-primary">${{pago.dineroIngresado}}</span>
+            </h3>
         </div>
         <div class="w-100"></div>
         <div class="col-3 col-sm- offset-4">
             <h3>Dinero faltante:</h3>
         </div>
-        <div class="col-3 col-sm-3 ">
-            <h3><span class="badge badge-primary">${{pago.dineroFaltante}}</span></h3>
+        <div *ngIf="pago.dineroFaltante !=1" class="col-3 col-sm-3 ">
+            <h3>
+                <span class="badge badge-primary">${{pago.dineroFaltante}}</span>
+            </h3>
+        </div>
+        <div *ngIf="pago.dineroFaltante == 1" class="col-3 col-sm-3 ">
+            <h3>
+                <span class="badge badge-primary">$0</span>
+            </h3>
         </div>
     </div>
     <div *ngIf="flagVuelto" class="row" style="padding-top: 20%;">
@@ -27,7 +43,9 @@
             <h3>Dinero regresado:</h3>
         </div>
         <div class="col-3 col-sm-3 ">
-            <h3><span class="badge badge-primary">${{vuelto.DineroRegresado}}</span></h3>
+            <h3>
+                <span class="badge badge-primary">${{vuelto.DineroRegresado}}</span>
+            </h3>
         </div>
         <!-- Force next columns to break to new line -->
         <div class="w-100"></div>
@@ -35,7 +53,9 @@
             <h3>Dinero faltante:</h3>
         </div>
         <div class="col-3 col-sm-3 ">
-            <h3><span class="badge badge-primary">${{vuelto.DineroFaltante}}</span></h3>
+            <h3>
+                <span class="badge badge-primary">${{vuelto.DineroFaltante}}</span>
+            </h3>
         </div>
     </div>
     <div *ngIf="flagPago" class="mx-auto" style="width: 150px; margin-top: 15%;">
