@@ -6,6 +6,8 @@ import Swal from 'sweetalert2';
 import { NgxToastrService } from '../../services/ngx-toastr/ngx-toastr.service';
 import { interval, Subscription, from } from 'rxjs';
 import { TRANSITION_DURATIONS } from 'ngx-bootstrap/modal/modal-options.class';
+import { $ } from 'protractor';
+import { Pago } from '../../models/pago/pago';
 
 @Component({
   selector: 'app-pago',
@@ -16,23 +18,35 @@ export class PagoComponent implements OnInit {
 
   subConsultaEST: Subscription;
   flagMensajeEST: boolean = false;
+  flagMensajeFloat: boolean = false;
+
+  pago: Pago = {
+    montoAPagar: 0,
+    dineroIngresado: 0,
+    dineroFaltante: 0
+  };
 
   constructor(private PagoService: PagoServiceService, private router: Router, private sweetAlertService: SweetAlertService, private ngxToastrService: NgxToastrService) { }
 
   ngOnInit() {
-    this.PagoService.floatByDenomination();
+    //this.PagoService.floatByDenomination();
     this.timerConsultaEST();
+    this.pago.montoAPagar = 2000
   }
   async inicioPago() {    
     this.sweetAlertService.swalLoading("Iniciando");
-    var response = await this.PagoService.iniciarPago();
-    Swal.close();
+    var response = await this.PagoService.iniciarPago(this.pago.montoAPagar);
+    Swal.close();    
     console.log("estadoInicio: " + JSON.stringify(response));
-
     if (response['bloqueoEfectivo']) {
       console.log("bloqueo!!! bloqueo!!!")
       this.flagMensajeEST = true;
-      this.sweetAlertService.CalcularOperacion("Temporalmente fuera de servicio");
+      this.sweetAlertService.CalcularOperacion("Temporalmente fuera de servicio"); 
+    }else if(response['statusMaquina'].floating)
+    {
+      console.log("flotando")
+      this.flagMensajeFloat = true;
+      this.sweetAlertService.CalcularOperacion("Por favor espere unos segundos");
     }else
     {
       if (response['status']) {
@@ -56,15 +70,31 @@ export class PagoComponent implements OnInit {
   async consultaEST() {
     var response = await this.PagoService.estadSalud();
     console.log("estado salud:"+JSON.stringify(response));
+    if(response['statusMaquina'].floating)
+    {
+      console.log("flotando");
+      if (!this.flagMensajeFloat) {
+        this.sweetAlertService.CalcularOperacion("Por favor espere unos segundos");  
+      }
+      this.flagMensajeFloat = true;    
+    }
+    else
+    {
+      if (this.flagMensajeFloat) {
+        Swal.close();  
+      }      
+      this.flagMensajeFloat = false;
+    }
     if (response['bloqueoEfectivo']) {
       if (!this.flagMensajeEST) {
         this.sweetAlertService.CalcularOperacion("Temporalmente fuera de servicio");  
       }
       this.flagMensajeEST = true;      
-    }
-    else
+    }else
     {
-      Swal.close();
+      if (this.flagMensajeEST) {
+        Swal.close();  
+      }      
       this.flagMensajeEST = false; 
     }
   }

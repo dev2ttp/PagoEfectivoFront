@@ -15,7 +15,7 @@ import { delay } from 'q';
   templateUrl: './pago-efectivo.component.html',
   styleUrls: ['./pago-efectivo.component.css']
 })
-export class PagoEfectivoComponent implements OnInit, OnDestroy {
+export class PagoEfectivoComponent implements OnInit, OnDestroy { 
 
   dineroIngresado: number;
   dinerFaltarte: number;
@@ -41,14 +41,12 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     dineroIngresado: 0,
     dineroFaltante: 0
   };
-
   vuelto: Vuelto = {
     VueltoTotal: 0,
     DineroFaltante: 0,
     DineroRegresado: 0,
     VueltoFinalizado: false
   };
-
   constructor(private PagoService: PagoServiceService, private router: Router, private sweetAlertService: SweetAlertService, private ngxToastrService: NgxToastrService) {
   }
   ngOnInit() {
@@ -119,7 +117,6 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
       var response = await this.PagoService.detallesVuelto(this.vuelto.VueltoTotal)
       console.log("estadoVuelto: " + JSON.stringify(response));
       if (response['status']) {
-
         if (response['bloqueoEfectivo'] && this.flagConsultaEST == false) {
           console.log("bloqueo!! bloqueo!!")
           this.flagConsultaEST = true;
@@ -127,8 +124,6 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           this.router.navigate(['/pago']);
           this.subStdVuelto.unsubscribe();
         }
-
-
         if (response['pagoStatus'] == false) {
           if (this.vuelto.DineroFaltante == response['data']['dineroFaltante']) {
             if (!this.flagDetenerVuelto) {
@@ -139,7 +134,9 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
           else {
             this.flagOutPago = false;
             this.subOutPago.unsubscribe();
-            this.subDetenerVuelto.unsubscribe();
+            if (this.subDetenerVuelto) {
+              this.subDetenerVuelto.unsubscribe();
+            }
           }
           this.vuelto.VueltoFinalizado = response['data']['vueltoFinalizado'];
           this.vuelto.DineroFaltante = response['data']['dineroFaltante'];
@@ -197,31 +194,11 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     }
   }
   async cancelaTimeOutPago() {
-    if (this.subStdVuelto) {
-      console.log("entro fuera vuelto");
-
-      this.subStdVuelto.unsubscribe();
-    }
-
-    if (this.subOutPago) {
-      console.log("entro fuera pago");
-      this.subOutPago.unsubscribe();
-    }
-
-    if (this.subEstDinero) {
-      console.log("entro a timer dinero");
-      this.subEstDinero.unsubscribe();
-    }
-
-    if (this.subCancelacion) {
-      console.log("entro a quitar cancelacion");
-      this.subCancelacion.unsubscribe();
-    }
-
-    if (this.subAlertCtn) {
-      console.log("entro quitar alerta");
-      this.subAlertCtn.unsubscribe();
-    }
+    if (this.subStdVuelto) this.subStdVuelto.unsubscribe();
+    if (this.subOutPago) this.subOutPago.unsubscribe();
+    if (this.subEstDinero) this.subEstDinero.unsubscribe();
+    if (this.subCancelacion) this.subCancelacion.unsubscribe();
+    if (this.subAlertCtn) this.subAlertCtn.unsubscribe();
     this.sweetAlertService.swalTimeOutPago();
     this.subAlertCtn = this.sweetAlertService.confirmation.subscribe(data => {
       if (data == "cancelar") {
@@ -238,7 +215,6 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
   async detenerVuelto() {
     var response = await this.PagoService.detenerVuelto();
     console.log("detenerVuelto: " + JSON.stringify(response));
-
   }
   timerEstadoDinero() {
     const source = interval(2000);
@@ -261,30 +237,11 @@ export class PagoEfectivoComponent implements OnInit, OnDestroy {
     this.subDetenerVuelto = source.subscribe(val => this.detenerVuelto());
   }
   ngOnDestroy() {
-
-    if (this.subStdVuelto) {
-      console.log("entro");
-      this.subStdVuelto.unsubscribe();
-    }
-    if (this.subOutPago) {
-      console.log("entro");
-      this.subOutPago.unsubscribe();
-    }
-    if (this.subOutPago) {
-      console.log("entro");
-      this.subOutPago.unsubscribe();
-    }
-    if (this.subCancelacion) {
-      console.log("entro");
-      this.subCancelacion.unsubscribe();
-    }
-    if (this.subAlertCtn) {
-      console.log("entro");
-      this.subAlertCtn.unsubscribe();
-    }
-    if (this.subDetenerVuelto) {
-      console.log("entro");
-      this.subDetenerVuelto.unsubscribe();
-    }
+    if (this.subStdVuelto) this.subStdVuelto.unsubscribe();
+    if (this.subOutPago) this.subOutPago.unsubscribe();
+    if (this.subOutPago) this.subOutPago.unsubscribe();
+    if (this.subCancelacion) this.subCancelacion.unsubscribe();
+    if (this.subAlertCtn) this.subAlertCtn.unsubscribe();
+    if (this.subDetenerVuelto) this.subDetenerVuelto.unsubscribe();
   }
 }
